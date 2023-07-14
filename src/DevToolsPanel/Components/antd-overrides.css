@@ -1,0 +1,4 @@
+/* Make indentation smaller so the scene tree does not become to wide */
+.scene-tree .ant-tree-indent-unit {
+    width: 4px;
+}

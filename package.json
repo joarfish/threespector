@@ -1,0 +1,50 @@
+{
+  "name": "threespector-extension",
+  "author": {
+    "name": "Jonas Klein",
+    "email": "hello@jonasklein.dev"
+  },
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "panel-dev": "vite --config vite.config.test.js",
+    "build": "tsc && vite build",
+    "lint": "eslint ./src --ext .ts,.tsx",
+    "lint-fix": "eslint --fix ./src --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.1.4",
+    "@react-three/drei": "^9.78.1",
+    "@react-three/fiber": "^8.13.4",
+    "@types/antd": "^1.0.0",
+    "@uiw/react-textarea-code-editor": "^2.1.7",
+    "antd": "^5.6.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "three": "^0.154.0",
+    "zustand": "^4.3.9"
+  },
+  "devDependencies": {
+    "@types/chrome": "0.0.240",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
+    "@types/three": "^0.153.0",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0",
+    "@vitejs/plugin-react": "^4.0.2",
+    "eslint": "^8.44.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-config-standard-with-typescript": "36.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-prettier": "^5.0.0-alpha.2",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.32.2",
+    "prettier": "^3.0.0",
+    "terser": "^5.19.0",
+    "typescript": "5.1.6",
+    "vite": "^4.4.2"
+  }
+}

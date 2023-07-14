@@ -1,0 +1,5 @@
+node_modules
+dist
+plugins
+vite.config.js
+vite.config.test.js

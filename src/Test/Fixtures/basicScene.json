@@ -1,0 +1,219 @@
+{
+  "objectByUuid": {
+    "O1": {
+      "uuid": "O1",
+      "type": "Scene",
+      "name": "MainScene",
+      "worldPosition": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "worldDirection": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "children": [
+        "O2",
+        "O3",
+        "O6"
+      ],
+      "isLight": false
+    },
+    "O2": {
+      "uuid": "O2",
+      "type": "Group",
+      "name": "Mesh Group",
+      "worldPosition": {
+        "x": 5,
+        "y": 0,
+        "z": 5
+      },
+      "worldDirection": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "position": {
+        "x": 5,
+        "y": 0,
+        "z": 5
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "children": [
+        "O4"
+      ],
+      "isLight": false
+    },
+    "O3": {
+      "uuid": "O3",
+      "type": "Mesh",
+      "name": "My Mesh1",
+      "worldPosition": {
+        "x": -10,
+        "y": 0,
+        "z": 7
+      },
+      "worldDirection": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "position": {
+        "x": -10,
+        "y": 0,
+        "z": 7
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "children": [
+        "O5"
+      ],
+      "isLight": false
+    },
+    "O4": {
+      "uuid": "O4",
+      "type": "Mesh",
+      "name": "My Mesh 2",
+      "worldPosition": {
+        "x": 6,
+        "y": 1,
+        "z": 5
+      },
+      "worldDirection": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "position": {
+        "x": 1,
+        "y": 1,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "children": [],
+      "materialUuids": [
+        "mazfusnfisfjlsidf"
+      ],
+      "isLight": false
+    },
+    "O5": {
+      "uuid": "O5",
+      "type": "Mesh",
+      "name": "SubMesh",
+      "worldPosition": {
+        "x": -4,
+        "y": 1,
+        "z": 7
+      },
+      "worldDirection": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "position": {
+        "x": 5,
+        "y": 1,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "children": [],
+      "materialUuids": [
+        "897347293847"
+      ],
+      "isLight": false
+    },
+    "O6": {
+      "uuid": "O6",
+      "type": "AmbientLight",
+      "name": "Main Light",
+      "worldPosition": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "worldDirection": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "position": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "rotation": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "scale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
+      "children": [],
+      "isLight": true
+    }
+  },
+  "objects": [
+    "O1",
+    "O2",
+    "O3",
+    "O4",
+    "O5",
+    "O6"
+  ],
+  "rootUuid": "O1"
+}
