@@ -7,7 +7,12 @@
 This project is in a very early stage! Currently, you can use this extension to get a very coarse overview of your
 scene, as well as edit the shaders of `ShaderMaterial`s and `RawShaderMaterial`s on the fly.
 
-## What's possible to do with threespector?
+## What's possible with threespector?
+
+Note: Objects added or removed at runtime after you've opened the
+developer tools panel will be tracked and displayed by the extension. 
+However, animations, updates to position, rotation or scale are **not**
+reflected in the extension's scene view.
 
 ### Complex Scene
 
@@ -60,7 +65,7 @@ const scene = new THREE.Scene();
 window.___threespector_scene___ = scene;
 ```
 
-## State of Development
+## Found a bug? Have a suggestion?
 
-The goal with this first release was to get the extension out and do some testing. The code and
-its architecture will definitely change.
+If you've found a bug or have a problem, feel free to open an issue. This will help improve 
+the extension. 
