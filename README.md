@@ -61,8 +61,7 @@ In order for ThreeSpector to find your scene you need to expose it globally in y
 the developer tools panel of the extension, it will look for `___threespector_scene___` and hook into it. So, all
 you have to do is:
 ```javascript
-const scene = new THREE.Scene();
-window.___threespector_scene___ = scene;
+window.___threespector_scene___ = scene; // <- your scene object
 ```
 
 ## Found a bug? Have a suggestion?
