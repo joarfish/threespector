@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Threespector",
   "description": "Collection of tools to inspect threejs applications.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "devtools_page": "index.html",
   "author": "hello@jonasklein.dev",
   "permissions": [
