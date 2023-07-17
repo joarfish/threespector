@@ -1,9 +1,12 @@
 import { useStore } from 'zustand';
 import { sceneStore } from '../../Store';
 import { shallow } from 'zustand/shallow';
-import { useState } from 'react';
+import { type PropsWithChildren, useState } from 'react';
+import { vector3dAsTuple } from './Utils/Transform';
 
-export function LightLocation(props: { uuid: string }): JSX.Element {
+export function LightLocation(
+    props: PropsWithChildren<{ uuid: string }>,
+): JSX.Element {
     const { uuid } = props;
     const { sceneObject, selectObject, selectedObject } = useStore(
         sceneStore,
@@ -15,7 +18,7 @@ export function LightLocation(props: { uuid: string }): JSX.Element {
         shallow,
     );
     const [hover, setHover] = useState(false);
-    const position = sceneObject?.worldPosition;
+    const position = sceneObject?.position;
 
     if (position === undefined) {
         return <></>;
@@ -23,7 +26,7 @@ export function LightLocation(props: { uuid: string }): JSX.Element {
 
     return (
         <mesh
-            position={[position.x, position.y, position.z]}
+            position={vector3dAsTuple(sceneObject.position)}
             onClick={() => {
                 selectObject(uuid);
             }}
@@ -40,6 +43,7 @@ export function LightLocation(props: { uuid: string }): JSX.Element {
                 toneMapped={false}
                 color={selectedObject === uuid || hover ? 0xff0000 : 0xaa00aa}
             />
+            {props.children}
         </mesh>
     );
 }

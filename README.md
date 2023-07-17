@@ -9,10 +9,9 @@ scene, as well as edit the shaders of `ShaderMaterial`s and `RawShaderMaterial`s
 
 ## What's possible with threespector?
 
-Note: Objects added or removed at runtime after you've opened the
-developer tools panel will be tracked and displayed by the extension. 
-However, animations, updates to position, rotation or scale are **not**
-reflected in the extension's scene view.
+Generally, threespector will keep track of all objects
+in your root scene. It will notice any changes to position,
+rotation, scale.
 
 ### Complex Scene
 

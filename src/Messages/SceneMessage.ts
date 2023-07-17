@@ -1,4 +1,9 @@
-import { type Scene, type SceneObject } from '../Common/Scene';
+import {
+    type Quaternion,
+    type Scene,
+    type SceneObject,
+    type Vector3d,
+} from '../Common/Scene';
 
 // Messages related to the main scene.
 
@@ -13,7 +18,7 @@ type ReportFullScene = {
 
 export type SceneUpdate =
     | { type: 'ObjectAdded'; parentUuid: string; object: SceneObject }
-    | { type: 'ObjectRemoved'; uuid: string };
+    | { type: 'ObjectRemoved'; parentUuid: string | undefined; uuid: string };
 
 type ReportSceneUpdate = {
     type: 'ReportSceneUpdate';
@@ -24,8 +29,25 @@ type ReportSceneLost = {
     type: 'ReportSceneLost';
 };
 
+export type TransformUpdate = {
+    uuid: string;
+    position: Vector3d;
+    worldPosition: Vector3d;
+    rotation: Vector3d;
+    worldDirection: Vector3d;
+    scale: Vector3d;
+    worldScale: Vector3d;
+    quaternion: Quaternion;
+};
+
+type ObjectTransformUpdated = {
+    type: 'ObjectTransformUpdated';
+    updates: TransformUpdate[];
+};
+
 export type SceneMessage =
     | RequestReportFullScene
     | ReportFullScene
     | ReportSceneUpdate
-    | ReportSceneLost;
+    | ReportSceneLost
+    | ObjectTransformUpdated;

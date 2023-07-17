@@ -14,6 +14,11 @@
         "y": 0,
         "z": 0
       },
+      "worldScale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
       "position": {
         "x": 0,
         "y": 0,
@@ -23,6 +28,12 @@
         "x": 0,
         "y": 0,
         "z": 0
+      },
+      "quaternion": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
       },
       "scale": {
         "x": 1,
@@ -34,7 +45,7 @@
         "O3",
         "O6"
       ],
-      "isLight": false
+      "spectorType": "Scene"
     },
     "O2": {
       "uuid": "O2",
@@ -50,6 +61,11 @@
         "y": 0,
         "z": 0
       },
+      "worldScale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
       "position": {
         "x": 5,
         "y": 0,
@@ -60,6 +76,12 @@
         "y": 0,
         "z": 0
       },
+      "quaternion": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
       "scale": {
         "x": 1,
         "y": 1,
@@ -68,7 +90,7 @@
       "children": [
         "O4"
       ],
-      "isLight": false
+      "spectorType": "Group"
     },
     "O3": {
       "uuid": "O3",
@@ -84,6 +106,11 @@
         "y": 0,
         "z": 0
       },
+      "worldScale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
       "position": {
         "x": -10,
         "y": 0,
@@ -94,6 +121,12 @@
         "y": 0,
         "z": 0
       },
+      "quaternion": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
       "scale": {
         "x": 1,
         "y": 1,
@@ -102,7 +135,7 @@
       "children": [
         "O5"
       ],
-      "isLight": false
+      "spectorType": "WithGeometry"
     },
     "O4": {
       "uuid": "O4",
@@ -118,15 +151,26 @@
         "y": 0,
         "z": 0
       },
-      "position": {
+      "worldScale": {
         "x": 1,
         "y": 1,
-        "z": 0
+        "z": 1
       },
       "rotation": {
         "x": 0,
         "y": 0,
         "z": 0
+      },
+      "position": {
+        "x": 1,
+        "y": 1,
+        "z": 0
+      },
+      "quaternion": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
       },
       "scale": {
         "x": 1,
@@ -137,7 +181,7 @@
       "materialUuids": [
         "mazfusnfisfjlsidf"
       ],
-      "isLight": false
+      "spectorType": "WithGeometry"
     },
     "O5": {
       "uuid": "O5",
@@ -153,6 +197,11 @@
         "y": 0,
         "z": 0
       },
+      "worldScale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
       "position": {
         "x": 5,
         "y": 1,
@@ -163,6 +212,12 @@
         "y": 0,
         "z": 0
       },
+      "quaternion": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
       "scale": {
         "x": 1,
         "y": 1,
@@ -172,7 +227,7 @@
       "materialUuids": [
         "897347293847"
       ],
-      "isLight": false
+      "spectorType": "WithGeometry"
     },
     "O6": {
       "uuid": "O6",
@@ -188,6 +243,11 @@
         "y": 0,
         "z": 0
       },
+      "worldScale": {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      },
       "position": {
         "x": 0,
         "y": 0,
@@ -198,13 +258,19 @@
         "y": 0,
         "z": 0
       },
+      "quaternion": {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "w": 1
+      },
       "scale": {
         "x": 1,
         "y": 1,
         "z": 1
       },
       "children": [],
-      "isLight": true
+      "spectorType": "Light"
     }
   },
   "objects": [

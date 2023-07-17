@@ -1,5 +1,5 @@
 import { ServiceWorkerDevPanelMessenger } from './Communication/ServiceWorkerDevPanelMessenger';
-import { type WorkerMessage } from './Messages';
+import { type WorkerMessage } from './Messages/WorkerMessages';
 
 // A map of connections from devtools-panels to this worker. The keys are the tabIds
 // of the windows/tabs that the respective devtools-panel is inspecting.

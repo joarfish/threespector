@@ -2,23 +2,23 @@ import { type JSX } from 'react';
 import { sceneStore } from '../../Store';
 import { SceneObject3d } from './SceneObject3d';
 import { useStore } from 'zustand';
+import { SelectedObjectAxes } from './SelectedObjectAxes';
 
 /**
- * Renders the actual scene and its objects.
+ * Scene graph entry
  * @constructor
  */
 export function Scene(): JSX.Element {
-    const objects = useStore(sceneStore, state => state.scene?.objects);
+    const rootUuid = useStore(sceneStore, state => state.scene.rootUuid);
 
-    if (objects === undefined) {
+    if (rootUuid === null) {
         return <></>;
     }
 
     return (
         <>
-            {objects.map(uuid => (
-                <SceneObject3d key={uuid} uuid={uuid} />
-            ))}
+            <SceneObject3d key={rootUuid} uuid={rootUuid} />
+            <SelectedObjectAxes />
         </>
     );
 }

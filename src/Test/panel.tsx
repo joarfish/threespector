@@ -10,8 +10,9 @@ import {
 import { type MessengerInterface } from '../Communication/MessengerInterface';
 import { type Message } from '../Messages';
 import { type ShaderMaterialEditorMessage } from '../Messages/ShaderMaterialEditorMessage';
+import { type Scene } from '../Common/Scene';
 
-sceneStore.getState().setScene(sceneJson);
+sceneStore.getState().setScene(sceneJson as Scene);
 // ShaderMaterial for testing
 shaderMaterialsStore.getState().addMaterial({
     uuid: '897347293847',

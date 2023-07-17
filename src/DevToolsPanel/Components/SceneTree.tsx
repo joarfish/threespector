@@ -16,8 +16,8 @@ export function SceneTree(): JSX.Element {
         useStore(
             sceneStore,
             state => ({
-                rootUuid: state.scene?.rootUuid,
-                objectByUuid: state.scene?.objectByUuid,
+                rootUuid: state.scene.rootUuid,
+                objectByUuid: state.scene.objectByUuid,
                 selectedObject: state.selectedObject,
                 selectObject: state.selectObject,
                 unselect: state.unselect,
@@ -37,7 +37,7 @@ export function SceneTree(): JSX.Element {
     }, [selectedObject]);
 
     const treeData = useMemo(() => {
-        if (rootUuid === undefined || objectByUuid === undefined) {
+        if (rootUuid === null) {
             return [];
         }
         const data = treeDataFromScene(rootUuid, objectByUuid, filterString);
@@ -73,7 +73,7 @@ export function SceneTree(): JSX.Element {
             <Tree
                 showLine
                 switcherIcon={<DownOutlined />}
-                defaultExpandedKeys={[rootUuid]}
+                defaultExpandedKeys={rootUuid !== null ? [rootUuid] : []}
                 onSelect={keys => {
                     if (keys.length === 0) {
                         unselect();

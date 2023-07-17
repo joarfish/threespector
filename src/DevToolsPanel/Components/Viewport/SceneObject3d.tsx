@@ -4,6 +4,7 @@ import { sceneStore } from '../../Store';
 import { shallow } from 'zustand/shallow';
 import { Mesh } from './Mesh';
 import { LightLocation } from './LightLocation';
+import { getTransform } from './Utils/Transform';
 
 /**
  * Renders a scene object using the right component based on type
@@ -27,31 +28,49 @@ export function SceneObject3d(props: { uuid: string }): JSX.Element {
         return <></>;
     }
 
-    if (sceneObject.isLight) {
-        return <LightLocation uuid={uuid} />;
-    }
-
-    switch (sceneObject.type) {
-        case 'Mesh':
+    switch (sceneObject.spectorType) {
+        case 'WithGeometry':
             return (
-                <>
-                    <Mesh sceneObject={sceneObject} />
-                    <axesHelper
-                        args={[2]}
-                        position={[
-                            sceneObject.worldPosition.x,
-                            sceneObject.worldPosition.y,
-                            sceneObject.worldPosition.z,
-                        ]}
-                        rotation={[
-                            sceneObject.worldDirection.x,
-                            sceneObject.worldDirection.y,
-                            sceneObject.worldDirection.z,
-                        ]}
-                    />
-                </>
+                <Mesh uuid={sceneObject.uuid}>
+                    {sceneObject.children.map(childUuid => (
+                        <SceneObject3d key={childUuid} uuid={childUuid} />
+                    ))}
+                </Mesh>
             );
+        case 'Group': {
+            return (
+                <group {...getTransform(sceneObject)}>
+                    {sceneObject.children.map(childUuid => (
+                        <SceneObject3d key={childUuid} uuid={childUuid} />
+                    ))}
+                </group>
+            );
+        }
+        case 'Scene': {
+            return (
+                <scene {...getTransform(sceneObject)}>
+                    {sceneObject.children.map(childUuid => (
+                        <SceneObject3d key={childUuid} uuid={childUuid} />
+                    ))}
+                </scene>
+            );
+        }
+        case 'Light': {
+            return (
+                <LightLocation uuid={uuid}>
+                    {sceneObject.children.map(childUuid => (
+                        <SceneObject3d key={childUuid} uuid={childUuid} />
+                    ))}
+                </LightLocation>
+            );
+        }
         default:
-            return <></>;
+            return (
+                <object3D {...getTransform(sceneObject)}>
+                    {sceneObject.children.map(childUuid => (
+                        <SceneObject3d key={childUuid} uuid={childUuid} />
+                    ))}
+                </object3D>
+            );
     }
 }

@@ -28,13 +28,18 @@ export function setupHandlers(messenger: MessengerInterface<Message>): void {
                     .getState()
                     .addSceneObject(update.parentUuid, update.object);
             } else if (update.type === 'ObjectRemoved') {
-                sceneStore.getState().removeSceneObject(update.uuid);
+                sceneStore
+                    .getState()
+                    .removeSceneObject(update.parentUuid, update.uuid);
+                if (update.uuid === sceneStore.getState().selectedObject) {
+                    sceneStore.getState().unselect();
+                }
             }
         });
     });
 
     messenger.on('ReportSceneLost', () => {
-        sceneStore.getState().setScene(null);
+        sceneStore.getState().reset();
     });
 
     messenger.on('ReportMaterials', message => {
@@ -49,5 +54,9 @@ export function setupHandlers(messenger: MessengerInterface<Message>): void {
 
     messenger.on('MaterialUnknown', message => {
         shaderMaterialsStore.getState().removeMaterial(message.uuid);
+    });
+
+    messenger.on('ObjectTransformUpdated', message => {
+        sceneStore.getState().updateTransforms(message.updates);
     });
 }

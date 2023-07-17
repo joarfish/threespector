@@ -5,29 +5,36 @@ import { MessageListener } from './MessageListener';
  * Messenger for communication between injected script and devtools-panel.
  * Should be used by the devtools-panel.
  */
-export class DevPanelMessenger<Messages extends { type: string }>
+export class BaseDevPanelMessenger<Messages extends { type: string }>
     implements MessengerInterface<Messages>
 {
     protected messageListener = new MessageListener<Messages>();
     protected port: chrome.runtime.Port | null = null;
+    protected channelName: string;
+    protected onConnectionEstablished?: (port: chrome.runtime.Port) => void;
 
-    constructor() {
+    constructor(
+        channelName: string,
+        onConnectionEstablished?: (port: chrome.runtime.Port) => void,
+    ) {
+        this.channelName = channelName;
+        this.onConnectionEstablished = onConnectionEstablished;
         this.establishConnection();
     }
 
     protected establishConnection(): void {
-        const port = chrome.runtime.connect({ name: 'devtools-passthrough' });
-        // Send init message to so service-worker knows the tab id the messenger
-        // is for.
-        port.postMessage({
-            type: 'init',
-            tabId: chrome.devtools.inspectedWindow.tabId,
-        });
+        const port = chrome.runtime.connect({ name: this.channelName });
+
+        if (this.onConnectionEstablished !== undefined) {
+            this.onConnectionEstablished(port);
+        }
+
         port.onMessage.addListener(message => {
             this.messageListener.receiveMessage(message);
         });
         port.onDisconnect.addListener(() => {
             this.port = null;
+            this.establishConnection();
         });
         this.port = port;
     }
@@ -57,10 +64,16 @@ export class DevPanelMessenger<Messages extends { type: string }>
             );
         }
 
-        this.port.postMessage({
-            type: 'send-message',
-            tabId: chrome.devtools.inspectedWindow.tabId,
-            message,
-        });
+        this.port.postMessage(this.transformMessage(message));
+    }
+
+    /**
+     * Transforms all messages before they are posted. Override this in extending
+     * classes to conform to what the service worker expects on this channel.
+     * @param message
+     * @protected
+     */
+    protected transformMessage(message: Messages): Record<string, unknown> {
+        return message;
     }
 }

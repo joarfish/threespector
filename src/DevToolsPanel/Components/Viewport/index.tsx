@@ -23,14 +23,6 @@ export function Viewport(): JSX.Element {
     const scene = useStore(sceneStore, state => state.scene);
     // Calculate width, center and scene's AABB
     const { width, center, sceneBox } = useMemo(() => {
-        if (scene === null) {
-            return {
-                width: 10,
-                height: 10,
-                center: [0, 0, 0] as const,
-            };
-        }
-
         let minX = Infinity;
         let minZ = Infinity;
         let maxX = -Infinity;
@@ -55,7 +47,7 @@ export function Viewport(): JSX.Element {
                 new THREE.Vector3(width, width, width),
             ),
         };
-    }, [scene]);
+    }, [scene.rootUuid]);
 
     const cameraRef = useRef<THREE.PerspectiveCamera>(null);
 

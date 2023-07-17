@@ -1,16 +1,17 @@
-import { type SceneObject } from '../../../Common/Scene';
-import { type JSX, useMemo, useState } from 'react';
+import { type JSX, type PropsWithChildren, useMemo, useState } from 'react';
 import { useStore } from 'zustand';
 import { sceneStore } from '../../Store';
 import { Box3, Color, Vector3 } from 'three';
 import { shallow } from 'zustand/shallow';
 import './ColoredBox3Helper';
+import { getTransform } from './Utils/Transform';
 
-export function Mesh(props: { sceneObject: SceneObject }): JSX.Element {
-    const { sceneObject } = props;
-    const { selectObject, selectedObject } = useStore(
+export function Mesh(props: PropsWithChildren<{ uuid: string }>): JSX.Element {
+    const { uuid } = props;
+    const { sceneObject, selectObject, selectedObject } = useStore(
         sceneStore,
         state => ({
+            sceneObject: state.scene?.objectByUuid[uuid],
             selectedObject: state.selectedObject,
             selectObject: state.selectObject,
         }),
@@ -19,18 +20,7 @@ export function Mesh(props: { sceneObject: SceneObject }): JSX.Element {
     const [hover, setHover] = useState(false);
     const boundingBox = useMemo(() => {
         if (sceneObject.box === undefined) {
-            return new Box3(
-                new Vector3(
-                    sceneObject.worldPosition.x - 1,
-                    sceneObject.worldPosition.y - 1,
-                    sceneObject.worldPosition.z - 1,
-                ),
-                new Vector3(
-                    sceneObject.worldPosition.x + 1,
-                    sceneObject.worldPosition.y + 1,
-                    sceneObject.worldPosition.z + 1,
-                ),
-            );
+            return new Box3(new Vector3(-1, -1, -1), new Vector3(1, 1, 1));
         }
         return new Box3(
             new Vector3(
@@ -53,27 +43,27 @@ export function Mesh(props: { sceneObject: SceneObject }): JSX.Element {
     }
 
     return (
-        <coloredBox3Helper
-            position={[
-                sceneObject.worldPosition.x,
-                sceneObject.worldPosition.y,
-                sceneObject.worldPosition.z,
-            ]}
-            args={[boundingBox]}
-            color={
-                hover || sceneObject.uuid === selectedObject
-                    ? hoverColor
-                    : color
-            }
-            onClick={() => {
-                selectObject(sceneObject.uuid);
-            }}
-            onPointerEnter={() => {
-                setHover(true);
-            }}
-            onPointerLeave={() => {
-                setHover(false);
-            }}
-        />
+        <object3D {...getTransform(sceneObject)}>
+            <coloredBox3Helper
+                args={[boundingBox]}
+                color={
+                    hover || sceneObject.uuid === selectedObject
+                        ? hoverColor
+                        : color
+                }
+                onClick={event => {
+                    selectObject(sceneObject.uuid);
+                    event.stopPropagation();
+                }}
+                onPointerEnter={event => {
+                    setHover(true);
+                    event.stopPropagation();
+                }}
+                onPointerLeave={event => {
+                    setHover(false);
+                    event.stopPropagation();
+                }}></coloredBox3Helper>
+            {props.children}
+        </object3D>
     );
 }

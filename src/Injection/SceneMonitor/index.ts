@@ -1,97 +1,15 @@
-import { type MessengerInterface } from '../Communication/MessengerInterface';
-import { type SceneMessage, type SceneUpdate } from '../Messages/SceneMessage';
-import { type AABB, type Scene, type SceneObject } from '../Common/Scene';
-import { type Scene as THREEScene, type Object3D, type Mesh } from 'three';
-import { type ShaderMaterialsCollection } from './ShaderMaterialEditor/ShaderMaterialsCollection';
-
-/**
- * Type guard for meshes.
- * @param obj
- */
-function isMesh(obj: Object3D): obj is Mesh {
-    return 'material' in obj && 'geometry' in obj;
-}
-
-/**
- * Normalize any object into a SceneObject that can be send to the devtools-panel.
- * @param object3d
- */
-function object3DtoSceneObject(object3d: Object3D): SceneObject {
-    const worldPosition = object3d.getWorldPosition(object3d.position.clone()); // Cloning a vector avoids importing THREE here.
-    const worldDirection = object3d.getWorldDirection(
-        object3d.position.clone(),
-    ); // Cloning a vector avoids importing THREE here.
-    let box: AABB | undefined;
-    let materialUuids: string[] | undefined;
-
-    if (isMesh(object3d)) {
-        const geometry = object3d.geometry;
-
-        if (Array.isArray(object3d.material)) {
-            materialUuids = object3d.material.map(({ uuid }) => uuid);
-        } else {
-            materialUuids = [object3d.material.uuid];
-        }
-
-        if (geometry.boundingBox === null) {
-            // Todo: Allow to be configured whether we are allowed to do this:
-            geometry.computeBoundingBox();
-        }
-
-        if (geometry.boundingBox !== null) {
-            const min = object3d.localToWorld(geometry.boundingBox.min.clone());
-            const max = object3d.localToWorld(geometry.boundingBox.max.clone());
-            box = {
-                min: {
-                    x: min.x,
-                    y: min.y,
-                    z: min.z,
-                },
-                max: {
-                    x: max.x,
-                    y: max.y,
-                    z: max.z,
-                },
-            };
-        }
-    }
-
-    return {
-        type: object3d.type,
-        uuid: object3d.uuid,
-        name: object3d.name,
-        parent: object3d.parent?.uuid,
-        worldPosition: {
-            x: worldPosition.x,
-            y: worldPosition.y,
-            z: worldPosition.z,
-        },
-        worldDirection: {
-            x: worldDirection.x,
-            y: worldDirection.y,
-            z: worldDirection.z,
-        },
-        position: {
-            x: object3d.position.x,
-            y: object3d.position.y,
-            z: object3d.position.z,
-        },
-        rotation: {
-            x: object3d.rotation.x,
-            y: object3d.rotation.y,
-            z: object3d.rotation.z,
-        },
-        scale: {
-            x: object3d.scale.x,
-            y: object3d.scale.y,
-            z: object3d.scale.z,
-        },
-        children: object3d.children.map(({ uuid }) => uuid),
-        box,
-        materialUuids,
-        isLight: 'isLight' in object3d ? (object3d.isLight as boolean) : false,
-    };
-}
+import { type MessengerInterface } from '../../Communication/MessengerInterface';
+import {
+    type SceneMessage,
+    type SceneUpdate,
+    type TransformUpdate,
+} from '../../Messages/SceneMessage';
+import { type Scene } from '../../Common/Scene';
+import { type Scene as THREEScene, type Object3D } from 'three';
+import { type ShaderMaterialsCollection } from '../ShaderMaterialEditor/ShaderMaterialsCollection';
+import { getTransformUpdate } from './TransformUpdates';
+import { isMesh } from './Guards';
+import { object3DtoSceneObject } from './Conversion';
 
 // Todo: Decouple messaging from collecting!
 
@@ -103,6 +21,7 @@ export class SceneMonitor {
     protected scene: WeakRef<THREEScene>;
     protected messenger: MessengerInterface<SceneMessage>;
     protected shaderMaterialCollection: ShaderMaterialsCollection;
+    protected objects = new Map<string, WeakRef<Object3D>>();
 
     constructor(
         scene: THREEScene,
@@ -117,6 +36,31 @@ export class SceneMonitor {
             this.handleRequestReportFullScene();
         });
         this.injectCallbacks(scene);
+
+        // This will be called on every frame and inform the devtools panel of
+        // transform changes
+        const refresh = (): void => {
+            const updates: TransformUpdate[] = [];
+            for (const objectRef of this.objects.values()) {
+                const object = objectRef.deref();
+                if (object === undefined) {
+                    continue;
+                }
+                const update = getTransformUpdate(object);
+                if (update !== null) {
+                    updates.push(update);
+                }
+            }
+            if (updates.length > 0) {
+                this.messenger.post({
+                    type: 'ObjectTransformUpdated',
+                    updates,
+                });
+            }
+            requestAnimationFrame(refresh);
+        };
+
+        requestAnimationFrame(refresh);
     }
 
     /**
@@ -142,15 +86,19 @@ export class SceneMonitor {
             this._add(...objects);
         };
         prototype._remove = prototype.remove;
-        prototype.remove = function remove(...object: Object3D[]) {
+        prototype.remove = function remove(...objects: Object3D[]) {
             that.messenger.post({
                 type: 'ReportSceneUpdate',
-                updates: object.map(o => ({
+                updates: objects.map(object => ({
                     type: 'ObjectRemoved',
-                    uuid: o.uuid,
+                    uuid: object.uuid,
+                    parentUuid: object.parent?.uuid,
                 })),
             });
-            this._remove(...object);
+            objects.forEach(({ uuid }) => {
+                that.objects.delete(uuid);
+            });
+            this._remove(...objects);
             setTimeout(() => {
                 that.shaderMaterialCollection.refreshMaterials();
             }, 0);
@@ -163,9 +111,11 @@ export class SceneMonitor {
                     {
                         type: 'ObjectRemoved',
                         uuid: this.uuid,
+                        parentUuid: this.parent.uuid,
                     },
                 ],
             });
+            that.objects.delete(object.uuid);
             this._removeFromParent();
             setTimeout(() => {
                 that.shaderMaterialCollection.refreshMaterials();
@@ -209,6 +159,7 @@ export class SceneMonitor {
             sceneReport.objectByUuid[object.uuid] =
                 object3DtoSceneObject(object);
             this.injectCallbacks(object);
+            this.objects.set(object.uuid, new WeakRef(object));
         }
 
         this.messenger.post({
@@ -239,6 +190,7 @@ export class SceneMonitor {
                 parentUuid,
                 object: object3DtoSceneObject(object),
             });
+            this.objects.set(object.uuid, new WeakRef(object));
         }
 
         this.messenger.post({

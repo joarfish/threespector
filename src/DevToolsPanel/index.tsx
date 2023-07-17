@@ -1,8 +1,8 @@
-import { DevPanelMessenger } from '../Communication/DevPanelMessenger';
+import { BaseDevPanelMessenger } from '../Communication/BaseDevPanelMessenger';
 import ReactDOM from 'react-dom/client';
 import React from 'react';
 import { DevToolsPanel } from './Components/DevToolsPanel';
-import { type Message, type WorkerMessage } from '../Messages';
+import { type Message } from '../Messages';
 import { resetState } from './Store';
 import { setupHandlers } from './Handlers';
 import {
@@ -11,14 +11,25 @@ import {
 } from './Controller/ShaderMaterialEditorController';
 import { type MessengerInterface } from '../Communication/MessengerInterface';
 import { type ShaderMaterialEditorMessage } from '../Messages/ShaderMaterialEditorMessage';
-import { DevPanelWorkerMessenger } from '../Communication/DevPanelWorkerMessenger';
+import { type WorkerMessage } from '../Messages/WorkerMessages';
+import { DevPanelPassthroughMessenger } from '../Communication/DevPanelPassthroughMessenger';
 
 // This is the main entry to the devtools-panel.
 
 // Messenger for communication between devtools-panel and injected script:
-const messenger = new DevPanelMessenger<Message>();
+const messenger = new DevPanelPassthroughMessenger<Message>(
+    'devtools-passthrough',
+    port => {
+        port.postMessage({
+            type: 'init',
+            tabId: chrome.devtools.inspectedWindow.tabId,
+        });
+    },
+);
 // Messenger for communication between devtools-panel and service worker:
-const workerMessenger = new DevPanelWorkerMessenger<WorkerMessage>();
+const workerMessenger = new BaseDevPanelMessenger<WorkerMessage>(
+    'devtools-worker',
+);
 
 setupHandlers(messenger);
 
