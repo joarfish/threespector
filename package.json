@@ -5,7 +5,7 @@
     "email": "hello@jonasklein.dev"
   },
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "license": "MIT",
   "scripts": {
@@ -16,21 +16,21 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.1.4",
-    "@react-three/drei": "^9.78.1",
-    "@react-three/fiber": "^8.13.4",
+    "@react-three/drei": "9.97.6",
+    "@react-three/fiber": "8.15.16",
     "@types/antd": "^1.0.0",
     "@uiw/react-textarea-code-editor": "^2.1.7",
     "antd": "^5.6.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "three": "^0.154.0",
+    "three": "0.161.0",
     "zustand": "^4.3.9"
   },
   "devDependencies": {
     "@types/chrome": "0.0.240",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
-    "@types/three": "^0.153.0",
+    "@types/three": "0.161.2",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
     "@vitejs/plugin-react": "^4.0.2",
@@ -42,9 +42,9 @@
     "eslint-plugin-prettier": "^5.0.0-alpha.2",
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.32.2",
-    "prettier": "^3.0.0",
-    "terser": "^5.19.0",
+    "prettier": "3.2.5",
+    "terser": "5.27.1",
     "typescript": "5.1.6",
-    "vite": "^4.4.2"
+    "vite": "5.1.3"
   }
 }

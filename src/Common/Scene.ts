@@ -31,6 +31,7 @@ export type SceneObject = {
     worldPosition: Vector3d;
     worldDirection: Vector3d;
     box?: AABB;
+    worldBox?: AABB;
     position: Vector3d;
     rotation: Vector3d;
     quaternion: Quaternion;

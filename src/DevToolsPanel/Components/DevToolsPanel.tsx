@@ -2,7 +2,8 @@ import { type JSX } from 'react';
 import { SceneTree } from './SceneTree';
 import { Viewport } from './Viewport';
 import { ObjectInfo } from './ObjectInfo';
-import { App, Col, ConfigProvider, Layout, Row, theme } from 'antd';
+import { App, Card, Col, ConfigProvider, Layout, Row, theme } from 'antd';
+import { UpVectorSelection } from './UpVectorSelection';
 
 const { darkAlgorithm } = theme;
 
@@ -34,8 +35,18 @@ export function DevToolsPanel(): JSX.Element {
                                 maxHeight: '100vh',
                                 overflow: 'auto',
                                 overflowX: 'hidden',
+                                display: 'flex',
+                                flexDirection: 'column',
                             }}>
                             <SceneTree />
+                            <div
+                                style={{
+                                    marginTop: 'auto',
+                                }}>
+                                <Card title={'Preferences'}>
+                                    <UpVectorSelection />
+                                </Card>
+                            </div>
                         </Col>
                         <Col
                             span={14}

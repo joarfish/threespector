@@ -1,8 +1,9 @@
 import { sceneStore } from './Scene';
 import { shaderMaterialsStore } from './ShaderMaterials';
+import { applicationStore } from './Application';
 
 // Re-export the stores of the application:
-export { sceneStore, shaderMaterialsStore };
+export { sceneStore, shaderMaterialsStore, applicationStore };
 
 /**
  * Resets the state of all stores. This should be done when the website being

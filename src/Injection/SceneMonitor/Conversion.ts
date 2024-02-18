@@ -51,6 +51,7 @@ export function object3DtoSceneObject(object3d: Object3D): SceneObject {
     );
     const worldScale = object3d.getWorldScale(object3d.position.clone());
     let box: AABB | undefined;
+    let worldBox: AABB | undefined;
     let materialUuids: string[] | undefined;
     let spectorType: SpectorObjectType = 'Other';
 
@@ -74,6 +75,10 @@ export function object3DtoSceneObject(object3d: Object3D): SceneObject {
             box = {
                 min: vector3ToVector3d(min),
                 max: vector3ToVector3d(max),
+            };
+            worldBox = {
+                min: vector3ToVector3d(object3d.localToWorld(min.clone())),
+                max: vector3ToVector3d(object3d.localToWorld(max.clone())),
             };
         }
 
@@ -100,6 +105,7 @@ export function object3DtoSceneObject(object3d: Object3D): SceneObject {
         scale: vector3ToVector3d(object3d.scale),
         children: object3d.children.map(({ uuid }) => uuid),
         box,
+        worldBox,
         materialUuids,
         spectorType,
     };

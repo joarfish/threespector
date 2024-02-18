@@ -6,25 +6,27 @@ import type { DataNode } from 'antd/es/tree';
 import { DownOutlined } from '@ant-design/icons';
 import { type SceneObject } from '../../Common/Scene';
 import { shallow } from 'zustand/shallow';
+import { useSceneController } from '../Controller/SceneController';
 
 /**
  * A tree view of the scene with a filter input.
  * @constructor
  */
 export function SceneTree(): JSX.Element {
-    const { rootUuid, objectByUuid, selectedObject, selectObject, unselect } =
+    const sceneController = useSceneController();
+    const { rootUuid, selectedObject, selectObject, unselect, sceneVersion } =
         useStore(
             sceneStore,
             state => ({
                 rootUuid: state.scene.rootUuid,
-                objectByUuid: state.scene.objectByUuid,
                 selectedObject: state.selectedObject,
                 selectObject: state.selectObject,
                 unselect: state.unselect,
+                sceneVersion: state.sceneVersion,
             }),
             shallow,
         );
-    const [expanded, setExpanded] = useState<Key[]>([]);
+    const [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
     const [filterString, setFilterString] = useState<string | undefined>(
         undefined,
     );
@@ -33,17 +35,25 @@ export function SceneTree(): JSX.Element {
         if (selectedObject === null) {
             return;
         }
-        setExpanded([...expanded, selectedObject]);
+
+        setExpandedKeys([
+            ...expandedKeys.filter(key => key !== selectedObject),
+            selectedObject,
+        ]);
     }, [selectedObject]);
 
     const treeData = useMemo(() => {
         if (rootUuid === null) {
             return [];
         }
+        const objectByUuid = sceneStore.getState().scene.objectByUuid;
         const data = treeDataFromScene(rootUuid, objectByUuid, filterString);
 
         return data === null ? [] : [data];
-    }, [rootUuid, objectByUuid, filterString]);
+    }, [rootUuid, sceneVersion, filterString]);
+
+    const objectByUuid = sceneStore.getState().scene.objectByUuid;
+    const objects = sceneStore.getState().scene.objects;
 
     if (rootUuid === undefined || objectByUuid === undefined) {
         return <span>No scene available</span>;
@@ -58,11 +68,7 @@ export function SceneTree(): JSX.Element {
     };
 
     return (
-        <Card
-            size={'small'}
-            className={'scene-tree'}
-            title={'Scene'}
-            style={{ height: '100%' }}>
+        <Card size={'small'} className={'scene-tree'} title={'Scene'}>
             <Input.Search
                 placeholder={'Filter'}
                 onSearch={handleFilterInput}
@@ -81,9 +87,19 @@ export function SceneTree(): JSX.Element {
                         selectObject(keys[0] as string);
                     }
                 }}
+                onDoubleClick={(event, node) => {
+                    sceneController.setCameraToObject(node.key as string);
+                    selectObject(node.key as string);
+                    event.stopPropagation();
+                }}
+                onExpand={keys => {
+                    setExpandedKeys(keys);
+                }}
+                expandedKeys={expandedKeys.filter(key =>
+                    objects.includes(key as string),
+                )}
                 treeData={treeData}
                 selectedKeys={selectedObject === null ? [] : [selectedObject]}
-                autoExpandParent={true}
             />
         </Card>
     );
@@ -101,6 +117,10 @@ function treeDataFromScene(
     filterString?: string,
 ): DataNode | null {
     const rootObject = objectByUuid[rootUuid];
+
+    if (rootObject === undefined) {
+        return null;
+    }
 
     if (filterString !== undefined) {
         const children = rootObject.children
@@ -123,8 +143,8 @@ function treeDataFromScene(
     return {
         title: rootObject.name !== '' ? rootObject.name : rootObject.type,
         key: rootObject.uuid,
-        children: rootObject.children.map(uuid =>
-            treeDataFromScene(uuid, objectByUuid, filterString),
-        ) as DataNode[],
+        children: rootObject.children
+            .map(uuid => treeDataFromScene(uuid, objectByUuid, filterString))
+            .filter(child => child !== null) as DataNode[],
     };
 }

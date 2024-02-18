@@ -82,44 +82,59 @@ export class SceneMonitor {
 
         prototype._add = prototype.add;
         prototype.add = function add(...objects: Object3D[]) {
-            that.handleNewObjects(this.uuid, objects);
             this._add(...objects);
+            // Only handle added objects if the object `add` was called
+            // on is known to threespector:
+            if (that.objects.has(this.uuid)) {
+                that.handleNewObjects(this.uuid, objects);
+            }
         };
         prototype._remove = prototype.remove;
         prototype.remove = function remove(...objects: Object3D[]) {
-            that.messenger.post({
-                type: 'ReportSceneUpdate',
-                updates: objects.map(object => ({
-                    type: 'ObjectRemoved',
-                    uuid: object.uuid,
-                    parentUuid: object.parent?.uuid,
-                })),
-            });
-            objects.forEach(({ uuid }) => {
-                that.objects.delete(uuid);
-            });
+            // Only report updates for objects that are actually part of the scene
+            // threespector is monitoring
+            const objectsInScene = objects.filter(object =>
+                that.objects.has(object.uuid),
+            );
+
+            if (objectsInScene.length > 0) {
+                that.messenger.post({
+                    type: 'ReportSceneUpdate',
+                    updates: objectsInScene.map(object => ({
+                        type: 'ObjectRemoved',
+                        uuid: object.uuid,
+                        parentUuid: object.parent?.uuid,
+                    })),
+                });
+                objectsInScene.forEach(({ uuid }) => {
+                    that.objects.delete(uuid);
+                });
+                setTimeout(() => {
+                    that.shaderMaterialCollection.refreshMaterials();
+                }, 0);
+            }
+
             this._remove(...objects);
-            setTimeout(() => {
-                that.shaderMaterialCollection.refreshMaterials();
-            }, 0);
         };
         prototype._removeFromParent = prototype.removeFromParent;
         prototype.removeFromParent = function removeFromParent() {
-            that.messenger.post({
-                type: 'ReportSceneUpdate',
-                updates: [
-                    {
-                        type: 'ObjectRemoved',
-                        uuid: this.uuid,
-                        parentUuid: this.parent.uuid,
-                    },
-                ],
-            });
-            that.objects.delete(object.uuid);
+            if (that.objects.has(this.uuid)) {
+                that.messenger.post({
+                    type: 'ReportSceneUpdate',
+                    updates: [
+                        {
+                            type: 'ObjectRemoved',
+                            uuid: this.uuid,
+                            parentUuid: this.parent.uuid,
+                        },
+                    ],
+                });
+                that.objects.delete(object.uuid);
+                setTimeout(() => {
+                    that.shaderMaterialCollection.refreshMaterials();
+                }, 0);
+            }
             this._removeFromParent();
-            setTimeout(() => {
-                that.shaderMaterialCollection.refreshMaterials();
-            }, 0);
         };
     }
 
@@ -135,7 +150,9 @@ export class SceneMonitor {
             });
             return;
         }
-        this.shaderMaterialCollection.clear(); // Clear material collection to they can collected again and messaged to the devtool-panel
+        this.shaderMaterialCollection.clear(); // Clear material collection to they can be collected again and messaged to the devtool-panel
+        this.objects.clear();
+
         const sceneReport: Scene = {
             objects: [],
             objectByUuid: {},
@@ -177,20 +194,29 @@ export class SceneMonitor {
      */
     protected handleNewObjects(parentUuid: string, objects: Object3D[]): void {
         const updates: SceneUpdate[] = [];
-        const children: Object3D[] = [];
+        const newObjects: Object3D[] = [...objects];
 
-        for (const object of objects) {
+        while (newObjects.length > 0) {
+            const object = newObjects.shift();
+
+            if (object === undefined) {
+                break;
+            }
+            if (object.parent === null) {
+                continue;
+            }
+
             if (isMesh(object)) {
                 this.shaderMaterialCollection.addMaterial(object.material);
             }
             this.injectCallbacks(object);
-            Array.prototype.push.apply(object.children, children);
+            Array.prototype.push.apply(newObjects, object.children);
+            this.objects.set(object.uuid, new WeakRef(object));
             updates.push({
                 type: 'ObjectAdded',
-                parentUuid,
+                parentUuid: object.parent.uuid,
                 object: object3DtoSceneObject(object),
             });
-            this.objects.set(object.uuid, new WeakRef(object));
         }
 
         this.messenger.post({

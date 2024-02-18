@@ -40,6 +40,7 @@ export function setupHandlers(messenger: MessengerInterface<Message>): void {
 
     messenger.on('ReportSceneLost', () => {
         sceneStore.getState().reset();
+        shaderMaterialsStore.getState().reset();
     });
 
     messenger.on('ReportMaterials', message => {

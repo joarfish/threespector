@@ -13,6 +13,10 @@ import { type MessengerInterface } from '../Communication/MessengerInterface';
 import { type ShaderMaterialEditorMessage } from '../Messages/ShaderMaterialEditorMessage';
 import { type WorkerMessage } from '../Messages/WorkerMessages';
 import { DevPanelPassthroughMessenger } from '../Communication/DevPanelPassthroughMessenger';
+import {
+    SceneController,
+    SceneControllerProvider,
+} from './Controller/SceneController';
 
 // This is the main entry to the devtools-panel.
 
@@ -65,13 +69,15 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
 // UI entry
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>
-        <ShaderMaterialEditorControllerProvider
-            value={
-                new ShaderMaterialEditorController(
-                    messenger as MessengerInterface<ShaderMaterialEditorMessage>,
-                )
-            }>
-            <DevToolsPanel />
-        </ShaderMaterialEditorControllerProvider>
+        <SceneControllerProvider value={new SceneController()}>
+            <ShaderMaterialEditorControllerProvider
+                value={
+                    new ShaderMaterialEditorController(
+                        messenger as MessengerInterface<ShaderMaterialEditorMessage>,
+                    )
+                }>
+                <DevToolsPanel />
+            </ShaderMaterialEditorControllerProvider>
+        </SceneControllerProvider>
     </React.StrictMode>,
 );

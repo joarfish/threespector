@@ -13,6 +13,11 @@ Generally, threespector will keep track of all objects
 in your root scene. It will notice any changes to position,
 rotation, scale.
 
+### Usage
+
+- Expand the tree nodes to see objects and their children
+- Double-click on the name of an object in the tree to jump to it in the 3D view
+
 ### Complex Scene
 
 All meshes are represented by their bounding boxes. Lights are also visible.
@@ -50,7 +55,7 @@ download the latest release and install it manually:
 
 ### Building the extension yourself
 
-If you want to build the extension yourself, just clone this repository, install all dependecies via `yarn install`
+If you want to build the extension yourself, just clone this repository, install all dependencies via `yarn install`
 and run `yarn build`. The extension will be placed in `./dist/`. When installing the extension in Chrome point it to
 the `dist`directory.
 

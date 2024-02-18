@@ -38,7 +38,15 @@ export class InjectedScriptMessenger<Messages extends { type: string }>
     post(message: Messages): void {
         window.postMessage({
             direction: 'injected-to-content',
-            message,
+            message: {
+                ...message,
+                timestamp: new Date().toLocaleTimeString('de', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    fractionalSecondDigits: 3,
+                }),
+            },
         });
     }
 }

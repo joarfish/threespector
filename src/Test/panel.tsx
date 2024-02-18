@@ -2,7 +2,7 @@ import ReactDOM from 'react-dom/client';
 import React from 'react';
 import { DevToolsPanel } from '../DevToolsPanel/Components/DevToolsPanel';
 import { sceneStore, shaderMaterialsStore } from '../DevToolsPanel/Store';
-import sceneJson from './Fixtures/basicScene.json';
+import sceneJson from './Fixtures/giga_scene.json';
 import {
     ShaderMaterialEditorController,
     ShaderMaterialEditorControllerProvider,
@@ -11,6 +11,10 @@ import { type MessengerInterface } from '../Communication/MessengerInterface';
 import { type Message } from '../Messages';
 import { type ShaderMaterialEditorMessage } from '../Messages/ShaderMaterialEditorMessage';
 import { type Scene } from '../Common/Scene';
+import {
+    SceneController,
+    SceneControllerProvider,
+} from '../DevToolsPanel/Controller/SceneController';
 
 sceneStore.getState().setScene(sceneJson as Scene);
 // ShaderMaterial for testing
@@ -45,13 +49,15 @@ const messenger = new TestMessenger();
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>
-        <ShaderMaterialEditorControllerProvider
-            value={
-                new ShaderMaterialEditorController(
-                    messenger as MessengerInterface<ShaderMaterialEditorMessage>,
-                )
-            }>
-            <DevToolsPanel />
-        </ShaderMaterialEditorControllerProvider>
+        <SceneControllerProvider value={new SceneController()}>
+            <ShaderMaterialEditorControllerProvider
+                value={
+                    new ShaderMaterialEditorController(
+                        messenger as MessengerInterface<ShaderMaterialEditorMessage>,
+                    )
+                }>
+                <DevToolsPanel />
+            </ShaderMaterialEditorControllerProvider>
+        </SceneControllerProvider>
     </React.StrictMode>,
 );

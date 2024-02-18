@@ -1,9 +1,11 @@
 import { createStore } from 'zustand';
 import { type Scene, type SceneObject } from '../../Common/Scene';
 import { type TransformUpdate } from '../../Messages/SceneMessage';
+import { hasOwnProperty, insertUnique } from './Utils';
 
 type SceneStore = {
     scene: Scene;
+    sceneVersion: number;
     selectedObject: string | null;
     setScene: (scene: Scene) => void;
     addSceneObject: (parentUuid: string, object: SceneObject) => void;
@@ -24,21 +26,20 @@ const emptyScene = {
 };
 
 export const sceneStore = createStore<SceneStore>()(set => ({
-    scene: emptyScene,
+    scene: { ...emptyScene },
     selectedObject: null,
+    sceneVersion: 0,
     setScene: (scene: Scene) => {
         set({
             scene,
+            sceneVersion: 0,
         });
     },
     addSceneObject: (parentUuid: string, object: SceneObject) => {
         set(state => {
             if (
                 state.scene === null ||
-                !Object.prototype.hasOwnProperty.call(
-                    state.scene.objectByUuid,
-                    parentUuid,
-                )
+                !hasOwnProperty(state.scene.objectByUuid, parentUuid)
             ) {
                 return state;
             }
@@ -47,15 +48,20 @@ export const sceneStore = createStore<SceneStore>()(set => ({
 
             return {
                 ...state,
+                sceneVersion: state.sceneVersion + 1,
                 scene: {
                     ...state.scene,
-                    objects: [...state.scene.objects, object.uuid],
+                    objects: [
+                        ...insertUnique(state.scene.objects, object.uuid),
+                    ],
                     objectByUuid: {
                         ...state.scene.objectByUuid,
                         [object.uuid]: object,
                         [parentUuid]: {
                             ...parent,
-                            children: [...parent.children, object.uuid],
+                            children: [
+                                ...insertUnique(parent.children, object.uuid),
+                            ],
                         },
                     },
                 },
@@ -64,7 +70,10 @@ export const sceneStore = createStore<SceneStore>()(set => ({
     },
     removeSceneObject: (parentUuid: string | undefined, objectUuid: string) => {
         set(state => {
-            if (state.scene === null) {
+            if (
+                state.scene === null ||
+                !hasOwnProperty(state.scene.objectByUuid, objectUuid)
+            ) {
                 return state;
             }
 
@@ -87,6 +96,7 @@ export const sceneStore = createStore<SceneStore>()(set => ({
             }
 
             return {
+                sceneVersion: state.sceneVersion + 1,
                 scene: {
                     ...state.scene,
                     objects: state.scene.objects.filter(
@@ -99,9 +109,7 @@ export const sceneStore = createStore<SceneStore>()(set => ({
     },
     selectObject: (uuid: string) => {
         set(({ scene }) => {
-            if (
-                !Object.prototype.hasOwnProperty.call(scene?.objectByUuid, uuid)
-            ) {
+            if (!hasOwnProperty(scene.objectByUuid, uuid)) {
                 return {};
             }
             return {
@@ -116,8 +124,9 @@ export const sceneStore = createStore<SceneStore>()(set => ({
     },
     reset: () => {
         set({
-            scene: emptyScene,
+            scene: { ...emptyScene },
             selectedObject: null,
+            sceneVersion: 0,
         });
     },
     updateTransforms: (transformUpdates: TransformUpdate[]) => {
@@ -127,6 +136,15 @@ export const sceneStore = createStore<SceneStore>()(set => ({
             }
             const objectByUuid = { ...scene.objectByUuid };
             for (const update of transformUpdates) {
+                if (
+                    !Object.prototype.hasOwnProperty.call(
+                        objectByUuid,
+                        update.uuid,
+                    )
+                ) {
+                    continue;
+                }
+
                 objectByUuid[update.uuid] = {
                     ...objectByUuid[update.uuid],
                     worldPosition: { ...update.worldPosition },
